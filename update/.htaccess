@@ -1,0 +1,8 @@
+<Directory "/opt/dashboard-iot/update">
+AuthType Basic
+AuthName "Restricted Files"
+# (Following line optional)
+AuthBasicProvider file
+AuthUserFile "/opt/credenciales/passwords"
+Require user slaveupdate
+</Directory>

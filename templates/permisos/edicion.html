@@ -1,0 +1,55 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal">{permisos.nombre}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="form-panel">
+                    <form class="form-horizontal style-form">
+                        <input type="hidden" id="idpermiso" value="{permisos.idpermiso}">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Nombre</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{permisos.nombre}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Descripcion</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="descripcion" name="descripcion" value="{permisos.descripcion}">
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" id="grabar" class="btn btn-primary">Grabar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#grabar").click(function() {
+        $.get("/permisos/?event=grabar", {
+                idpermiso: $("#idpermiso").val(),
+                nombre: $("#nombre").val(),
+                descripcion: $("#descripcion").val()
+            })
+            .done(function(data) {
+                table.ajax.reload();
+                $('#modal').modal('hide');
+
+
+            });
+
+    });
+</script>

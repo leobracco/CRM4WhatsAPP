@@ -1,0 +1,31 @@
+<section id="main-content">
+    <section class="wrapper">
+        <h3><i class="fa fa-angle-right"></i> Token</h3>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="form-panel">
+                    <h4 class="mb"><i class="fa fa-angle-right"></i>No divulgue su token</h4>
+                    <form action="#" class="form-horizontal style-form">
+
+                        <input type="hidden" id="idusuario" name="idusuario" class="form-control" value="{usuarios.idusuario}">
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Token</label>
+                            <div class="col-md-2 col-xs-2">
+
+                                <input type="text" id="token" name="token" value="{usuarios.token}" size="16" class="form-control" readonly>
+                                <span class="input-group-btn add-on">
+                                  <button class="btn btn-theme" type="button" id="generateToken"><i class="fa fa-refresh"></i></button>
+                                  <button type="button" id="saveToken" class="btn btn-theme date-set"><i class="fa fa-save"></i></button>
+                                  </span>
+                                <div id="info-token" class="alert alert-success" style="display:none"></div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script src="../js/tokens.js"></script>

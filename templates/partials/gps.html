@@ -1,0 +1,100 @@
+<script src="../js/jquery-1.11.1.js"></script>
+
+<script src="../js/main.js"></script>
+
+
+
+<div class="col-lg-6 main-chart">
+    <!--CUSTOM CHART START -->
+    <div class="border-head">
+        <h3>Velocidad y señal</h3>
+    </div>
+
+
+    <div id="chart-gps" width="500" height="400"></div>
+
+
+
+</div>
+<script>
+    var url = "../couchdb/?event=view";
+    var speeds = [];
+    var temp = [];
+    var arrayIdSensor = new Array;
+    var arrayIdSensorVal = new Array;
+
+    $.ajax({
+            // En data puedes utilizar un objeto JSON, un array o un query string
+            data: {
+                "cuenta": "quodii"
+            },
+            //Cambiar a type: POST si necesario
+            type: "GET",
+            // Formato de datos que se espera en la respuesta
+            dataType: "json",
+            // URL a la que se enviará la solicitud Ajax
+            url: url,
+        })
+        .done(function(data, textStatus, jqXHR) {
+            if (console && console.log) {
+                console.log("La solicitud se ha completado correctamente." + data.rows);
+            }
+
+            console.log("TAMAÑO:" + data.rows.length)
+
+
+
+            for (var i = 0; i < data.rows.length; i++) {
+                //console.log("ANTES ID sensor" + data.rows[i]['doc'].idsensor);
+
+                var found = arrayIdSensor.filter(function(item) {
+                    return item.name === data.rows[i]['doc'].idsensor;
+                });
+                //console.log('found', found[0]);
+                if (!found[0]) {
+                    arrayIdSensorVal[data.rows[i]['doc'].idsensor] = [];
+                    arrayIdSensor.push({
+                        name: data.rows[i]['doc'].idsensor,
+                        data: arrayIdSensorVal[data.rows[i]['doc'].idsensor]
+                    });
+                }
+
+
+            }
+            for (var i = 0; i < data.rows.length; i++) {
+                arrayIdSensorVal[data.rows[i]['doc'].idsensor].push([data.rows[i]['doc'].timestamp, data.rows[i]['doc'].value]);
+                //arrayIdSensorVal[data.rows[i]['doc'].idsensor].push(data.rows[i]['doc'].value);
+                //console.log("ID sensor" + data.rows[i]['doc'].idsensor + "-" + data.rows[i]['doc'].timestamp);
+
+            }
+            var options = {
+                chart: {
+                    type: 'line'
+                },
+                series: arrayIdSensor,
+
+                xaxis: {
+                    type: 'datetime',
+                    labels: {
+                        format: 'dd MM yyyy HH:mm'
+                    }
+                },
+
+                stroke: {
+                    curve: 'smooth',
+                }
+
+            }
+
+            var chart = new ApexCharts(document.querySelector("#chart-gps"), options);
+
+            chart.render();
+            /*console.log(data.rows[i]['doc'].value + "-" + data.rows[i]['doc'].idsensor)
+                temp[data.rows[i]['doc'].idsensor].push(data.rows[i]['doc'].value);*/
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            if (console && console.log) {
+                console.log("La solicitud a fallado: " + textStatus);
+            }
+        })
+</script>

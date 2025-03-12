@@ -1,0 +1,146 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal">{grupos.nombre}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="form-panel">
+                    <form class="form-horizontal style-form">
+                        <input type="hidden" id="idgrupo" value="{grupos.idgrupo}">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Nombre</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{grupos.nombre}">
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Permisos disponibles</div>
+                            <div class="panel-body">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <select class="form-control" id="idpermisos_agregar" multiple>
+                                                    <!-- BEGIN permisos.Row -->
+                                                            <option value="{permisos.idpermiso}">{permisos.descripcion}</option>
+                                                    <!-- END permisos.Row -->
+                                                </select>
+                                    </div>
+                                    <button type="button" id="agregar" class="btn btn-primary">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Permisos agregados</div>
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    <form role="form">
+                                        <div class="form-group">
+                                            <select class="form-control" id="grupos_permisos" multiple>
+                                                <!-- BEGIN grupos.permisos.Row -->
+                                                        <option value="{grupos.permisos.id}">{grupos.permisos.permiso.nombre}</option>
+                                                <!-- END grupos.permisos.Row -->
+                                            </select>
+                                        </div>
+                                        <button type="button" id="eliminar" class="btn btn-primary">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" id="grabar" class="btn btn-primary">Grabar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#grabar").click(function() {
+        $.get("/grupos/?event=grabar", {
+                idgrupo: $("#idgrupo").val(),
+                nombre: $("#nombre").val()
+            })
+            .done(function(data) {
+                table.ajax.reload();
+                $('#modal').modal('hide');
+
+
+            });
+
+    });
+    $("#agregar").click(function() {
+        if ($("#idgrupo").val() != '')
+            $.get("/grupos/?event=permiso_grabar", {
+                idgrupo: $("#idgrupo").val(),
+                idpermisos: $("#idpermisos_agregar").val()
+            })
+            .done(function(data) {
+                $("#idpermisos_agregar").empty();
+                $.each(data['permisosDisponibles'], function(i, item) {
+
+                    $("#idpermisos_agregar").append($("<option>", {
+                        value: item.idpermiso,
+                        text: item.nombre
+                    }));
+                });
+                $("#grupos_permisos").empty();
+                $.each(data['permisosAgregados'], function(i, item) {
+
+                    $("#grupos_permisos").append($("<option>", {
+                        value: item.idpermiso,
+                        text: item.nombre
+                    }));
+                });
+
+
+
+
+
+            });
+        else {
+            alert("Grabe el grupo primero")
+        }
+
+    });
+
+    $("#eliminar").click(function() {
+
+        $.get("/grupos/?event=eliminarpermiso", {
+                idgrupo: $("#idgrupo").val(),
+                idpermisos: $("#grupos_permisos").val()
+            })
+            .done(function(data) {
+                $("#idpermisos_agregar").empty();
+                $.each(data['permisosDisponibles'], function(i, item) {
+
+                    $("#idpermisos_agregar").append($("<option>", {
+                        value: item.idpermiso,
+                        text: item.nombre
+                    }));
+                });
+                $("#grupos_permisos").empty();
+                $.each(data['permisosAgregados'], function(i, item) {
+                    console.log("NOMBRE PERMISO" + item.nombre)
+                    $("#grupos_permisos").append($("<option>", {
+                        value: item.idpermiso,
+                        text: item.nombre
+                    }));
+                });
+
+
+            });
+
+
+    });
+</script>

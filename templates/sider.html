@@ -1,0 +1,240 @@
+<!--header start-->
+<header class="header black-bg">
+    <div class="sidebar-toggle-box">
+        <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
+    </div>
+    <a href="/" class="logo"><b>Quod<span>ii</span></b></a>
+    <div class="nav notify-row" id="top_menu">
+        <ul class="nav top-menu">
+
+            <!-- inbox dropdown end -->
+            <!-- notification dropdown start-->
+            <li id="header_notification_bar" class="dropdown">
+                <a id="ref-account" data-toggle="dropdown" class="dropdown-toggle" href="/"> </a>
+                <ul class="dropdown-menu extended notification" id="accounts">
+                    <div class="notify-arrow notify-arrow-yellow"></div>
+
+
+
+
+                </ul>
+            </li>
+
+        </ul>
+
+    </div>
+   
+    <div class="top-menu">
+        <ul class="nav pull-right top-menu">
+            <li><a class="logout" href="/inicio/?logout=1">Logout</a></li>
+        </ul>
+    </div>
+</header>
+<!--header end-->
+<!-- **********************************************************************************************************************************************************
+        MAIN SIDEBAR MENU
+        *********************************************************************************************************************************************************** -->
+<!--sidebar start-->
+<aside>
+    <div id="sidebar" class="nav-collapse ">
+        <!-- sidebar menu start-->
+        <ul class="sidebar-menu" id="nav-accordion">
+
+
+            <li class="mt">
+                <a class="active" href="/">
+                    <img src="../img/icons/dashboard.png">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;">
+                    <img src="../img/icons/devices.png">
+                    <span>Clientes</span>
+                </a>
+                <ul class="sub">
+                    <div id="Alarmaslectura">
+                        <li class="permiso" value="Alarmas::lectura">
+                            <a href="/alarmas/"><img src="../img/icons/list.png">Listado</a>
+                        </li>
+                    </div>
+                </ul>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;">
+                    <img src="../img/icons/eventos.png">
+                    <span>Eventos</span>
+                </a>
+                <ul class="sub">
+                    <div id="Eventoslectura">
+                        <li class="permiso" value="Eventos::lectura">
+                            <a href="/eventos/"><img src="../img/icons/list.png">Listado</a>
+                        </li>
+                    </div>
+                </ul>
+                <ul class="sub">
+                    <div id="Mapaslectura">
+                        <li class="permiso" value="Mapas::lectura">
+                            <a href="/mapas/"><img src="../img/icons/estadisticas.png">Mapa de Calor</a>
+                        </li>
+                    </div>
+                </ul>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;" onclick="OpenChat()">
+                    <img src="../img/icons/chat.png">
+                    <span>Chat</span>
+                </a>
+            </li>
+           <hr>
+            <li class="sub-menu">
+                <a href="javascript:;">
+                    <img src="../img/icons/settings.png">
+                    <span>Configuraciones</span>
+                </a>
+                <ul class="sub">
+                    <div id="Usuarioslectura">
+                        <li class="permiso" value="Usuarios::lectura">
+                            <a href="/usuarios/"><img src="../img/icons/user.png">Usuarios</a>
+                        </li>
+                    </div>
+                    <div id="Gruposlectura">
+                        <li class="permiso" value="Grupos::lectura">
+                            <a href="/grupos/"><img src="../img/icons/grupo.png">Grupos</a>
+                        </li>
+                    </div>
+                    <div id="Permisoslectura">
+                        <li class="permiso" value="Permisos::lectura">
+                            <a href="/permisos/"><img src="../img/icons/permisos.png">Permisos</a>
+                        </li>
+                    </div>
+                    <div id="Cuentaslectura">
+                        <li class="permiso" value="Cuentas::lectura">
+                            <a href="/cuentas/"><img src="../img/icons/account.png">Cuentas</a>
+                        </li>
+                    </div>
+                    <div id="Tokenlectura">
+                        <li class="permiso" value="Token::lectura">
+                            <a href="/token/"><img src="../img/icons/token.png">Token</a>
+                        </li>
+                    </div>
+                </ul>
+            </li>
+
+        </ul>
+        <!-- sidebar menu end-->
+    </div>
+</aside>
+<!--sidebar end-->
+<script src="../js/inicio.js"></script>
+<script>
+    $(document).ready(function() {
+
+
+        $(".permiso").each(function() {
+
+            var obj = $(this);
+            $.get("/usuarios/?event=check", {
+                    nombre: $(this).attr('value')
+                })
+                .done(function(data) {
+
+                    if (data.permiso == 0) {
+                        var Perm;
+                        Perm = obj.attr('value');
+
+                        Perm = Perm.split("::")
+                        $("#" + Perm[0] + Perm[1]).css("display", "none");
+
+                    }
+
+                });
+        });
+
+    });
+
+    var Script = function() {
+
+
+
+
+
+
+
+        //    sidebar toggle
+
+        $(function() {
+            function responsiveView() {
+                var wSize = $(window).width();
+                if (wSize <= 768) {
+                    $('#container').addClass('sidebar-close');
+                    $('#sidebar > ul').hide();
+                }
+
+                if (wSize > 768) {
+                    $('#container').removeClass('sidebar-close');
+                    $('#sidebar > ul').show();
+                }
+            }
+            $(window).on('load', responsiveView);
+            $(window).on('resize', responsiveView);
+        });
+
+        $('.fa-bars').click(function() {
+            if ($('#sidebar > ul').is(":visible") === true) {
+                $('#main-content').css({
+                    'margin-left': '0px'
+                });
+                $('#sidebar').css({
+                    'margin-left': '-210px'
+                });
+                $('#sidebar > ul').hide();
+                $("#container").addClass("sidebar-closed");
+            } else {
+                $('#main-content').css({
+                    'margin-left': '210px'
+                });
+                $('#sidebar > ul').show();
+                $('#sidebar').css({
+                    'margin-left': '0'
+                });
+                $("#container").removeClass("sidebar-closed");
+            }
+        });
+
+        // custom scrollbar
+
+
+        //  $("html").niceScroll({styler:"fb",cursorcolor:"#4ECDC4", cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
+
+        // widget tools
+
+        jQuery('.panel .tools .fa-chevron-down').click(function() {
+            var el = jQuery(this).parents(".panel").children(".panel-body");
+            if (jQuery(this).hasClass("fa-chevron-down")) {
+                jQuery(this).removeClass("fa-chevron-down").addClass("fa-chevron-up");
+                el.slideUp(200);
+            } else {
+                jQuery(this).removeClass("fa-chevron-up").addClass("fa-chevron-down");
+                el.slideDown(200);
+            }
+        });
+
+        jQuery('.panel .tools .fa-times').click(function() {
+            jQuery(this).parents(".panel").parent().remove();
+        });
+
+
+        //    tool tips
+
+        $('.tooltips').tooltip();
+
+        //    popovers
+
+        $('.popovers').popover();
+
+
+
+
+    }();
+</script>

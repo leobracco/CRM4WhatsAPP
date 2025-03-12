@@ -1,0 +1,86 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal">{cuentas.nombre}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="form-panel">
+                    <form class="form-horizontal style-form">
+                        <input type="hidden" id="idcuenta" value="{cuentas.id}">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Nombre de la Empresa</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{cuentas.nombre}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Cuenta</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="username" name="username" value="{cuentas.username}">
+                                <div id="valid-username">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" id="grabar" class="btn btn-primary">Grabar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#grabar").click(function() {
+        $.get("/cuentas/?event=grabar", {
+                idcuenta: $("#idcuenta").val(),
+                nombre: $("#nombre").val(),
+                username: $("#username").val()
+            })
+            .done(function(data) {
+                table.ajax.reload();
+                $('#modal').modal('hide');
+
+
+            });
+
+    });
+    $("#username").keyup(function() {
+        this.value = this.value.toLowerCase();
+        this.value = this.value.replace(/[^a-z]/g, '');
+        $.get("/cuentas/?event=checkaccount", {
+
+                username: $("#username").val()
+            })
+            .done(function(data) {
+                $("#valid-username").removeClass();
+                $("#valid-username").html(data.resultado)
+                $("#valid-username").addClass(data.div);
+
+
+            });
+
+    });
+    $("#eliminar").click(function() {
+
+        $.get("/cuentas/?event=borrar", {
+                idcuenta: $("#idcuenta").val()
+            })
+            .done(function(data) {
+                table.ajax.reload();
+                $('#modal').modal('hide');
+            });
+
+
+    });
+</script>
