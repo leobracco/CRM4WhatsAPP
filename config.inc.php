@@ -26,22 +26,12 @@ $_SESSION["MYSQL"]["USER"]=getenv("MYSQL_USER");
 $_SESSION["MYSQL"]["PASSWORD"]=getenv("MYSQL_PASSWORD");
 $_SESSION["MYSQL"]["PORT"]=getenv("MYSQL_PORT");
 
-$_SESSION["COUCHDB"]["HOST"]=getenv("COUCHDB_HOST");
-$_SESSION["COUCHDB"]["NAME"]=getenv("COUCHDB_NAME");
-$_SESSION["COUCHDB"]["USER"]=getenv("COUCHDB_USER");
-$_SESSION["COUCHDB"]["PASSWORD"]=getenv("COUCHDB_PASSWORD");
-$_SESSION["COUCHDB"]["PORT"]=getenv("COUCHDB_PORT");
-$_SESSION["COUCHDB"]["URL"] = "https://".$_SESSION["COUCHDB"]["USER"].":".$_SESSION["COUCHDB"]["PASSWORD"]."@".$_SESSION["COUCHDB"]["HOST"].":".$_SESSION["COUCHDB"]["PORT"]."/";
-
-$_SESSION["MQTT"]["HOST"]=getenv("MQTT_HOST");
-$_SESSION["MQTT"]["USER"]=getenv("MQTT_USER");
-$_SESSION["MQTT"]["PASSWORD"]=getenv("MQTT_PASSWORD");
-$_SESSION["MQTT"]["PORT"]=getenv("MQTT_PORT");
-$_SESSION["MQTT"]["PORTWS"]=getenv("MQTT_PORTWS");
 
 $_SESSION["WHATSAPP"]["PHONE_NUMBER_ID"]=getenv('PHONE_NUMBER_ID');
 $_SESSION["WHATSAPP"]["ACCESS_TOKEN"] = getenv('ACCESS_TOKEN');
-
+error_log("📞 PHONE_NUMBER_ID sin modificar: " . $this->phoneNumberId);
+error_log("📞 PHONE_NUMBER_ID sin modificar get directo: " . getenv('PHONE_NUMBER_ID'));
+error_log("User mysql: " . getenv('MYSQL_USER'));
 
 $_SESSION["APP"]["NAME"]="CRM";
 $_SESSION["EMPRESA"]["NAME"]="AP Velas & Aromas";
