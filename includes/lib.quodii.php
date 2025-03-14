@@ -361,7 +361,8 @@ class chats extends objdb {
         parent::__construct();
         $this->table = 'chats';
         $this->name = $this->table;
-        $this->fields = ['idchat', 'idcliente', 'mensaje', 'fecha', 'visto', 'remitente'];
+        $this->fields = ['idchat', 'idcliente', 'mensaje', 'original_idchat','timestamp', 'visto', 'sender'];
+		//$this->join('clientes', new ForeignKeys('Clientes', 'idcliente'));
         $this->initialize();
     }
     function ID_field() {

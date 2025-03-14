@@ -1,0 +1,64 @@
+#map {
+    height: 750px;
+}
+
+.table {
+    background: #212529 !important;
+    color: white !important;
+}
+
+.chat-circle {
+    background: #ffd900;
+    color: rgb(0, 0, 0);
+    padding: 5px 20px;
+    border-radius: 50%;
+    font-size: 35px;
+}
+
+.reply {
+    height: 60px;
+    width: 100%;
+    background-color: #f5f1ee;
+    padding: 10px 5px;
+    z-index: 1000;
+}
+
+.reply-main textarea {
+    width: 100%;
+    resize: none;
+    padding: 5px;
+    outline: none;
+    border: none;
+    font-size: 16px;
+}
+
+.reply-main textarea:focus {
+    outline: none;
+    border: none;
+}
+
+.sender {
+    float: right;
+    width: auto;
+    background: #dcf8c6;
+    border-radius: 10px 10px 0 10px;
+    padding: 4px 10px 7px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.receiver {
+    width: auto;
+    padding: 4px 10px 7px;
+    border-radius: 10px 10px 10px 0;
+    background: #ffffff;
+    font-size: 12px;
+    display: inline-block;
+}
+
+/* Responsive */
+@media screen and (max-width: 700px) {
+    #map {
+        height: 400px;
+    }
+}

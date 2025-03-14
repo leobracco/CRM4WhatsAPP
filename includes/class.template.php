@@ -66,10 +66,17 @@ class Template {
 
 
     function setVar($VarName, $VarValue) 
-	{
-            $this->Template = str_replace($VarName, $VarValue, $this->Template);
+{
+    // Convertir a string si es un array o un objeto
+    if (is_array($VarValue) || is_object($VarValue)) {
+        $VarValue = json_encode($VarValue);
+    } elseif (!is_string($VarValue)) {
+        $VarValue = (string) $VarValue;
     }
 
+    // Realizar la sustitución en la plantilla
+    $this->Template = str_replace($VarName, $VarValue, $this->Template);
+}
 	function setVars(&$vars, $prepend)
 	{
 		if (is_hash($vars)) 

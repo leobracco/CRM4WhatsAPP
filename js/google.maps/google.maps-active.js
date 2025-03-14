@@ -13,35 +13,18 @@ var path;
 var lastBoton=1;
 var lastusername=1;
 var JsonData={"geometry": {"type": "Point", "coordinates": ['0','0']}, "type": "Feature", "properties": {}};
-(function() {
-    var url = "../credenciales/?event=config";
-    $.getJSON(url, { format: "json" })
-        .done(function(data) {
-            host = data.host; // hostname or IP address
-            port = data.port;
-            topic = data.topic; // topic to subscribe to
-            topicMaster = data.topicMaster; // topic to subscribe to
-            topicSlave = data.topicSlave; // topic to subscribe to
-            useTLS = data.secure;
-            username = data.username;
-            password = data.token;
-            cleansession = data.session;
-            path = data.path;
-            MQTTconnect();
-        });
-})();
 
 
 function addUserChat()
 {
-    var url = "../usuarios/?event=lista_json_chat";
+    var url = "../clientes/?event=lista_json_chat";
     $.getJSON(url, { format: "json" }).
     done(function(data)
     {
         data.forEach(element =>
             {
                 var addUser;
-                addUser="<div class='row sideBar-body' style='display:block' celular='"+element.celular+"' nombre='"+element.nombre+"' celular='"+element.apellido+"'>";
+                addUser="<div class='row sideBar-body' style='display:block' celular='"+element.telefono+"' nombre='"+element.nombre+"' celular='"+element.apellido+"'>";
                 addUser+="<div class='col-sm-3 col-xs-3 sideBar-avatar'>";
                 addUser+="<div class='avatar-icon'>";
                 addUser+="<img src='../img/icons/person.png'>";
@@ -49,7 +32,10 @@ function addUserChat()
                 addUser+="<div class='col-sm-9 col-xs-9 sideBar-main'>";
                 addUser+="<div class='row'>";
                 addUser+="<div class='col-sm-8 col-xs-8 sideBar-name'>";
-                addUser+="<span class='name-meta' onclick=Chatear('"+element.username+"','"+element.nombre+"','"+element.apellido+"')>"+element.nombre+","+element.apellido;
+                if (element.nombre=='' && element.apellido=='')
+                addUser+="<span class='name-meta' onclick=Chatear('"+element.telefono+"','"+element.nombre+"','"+element.apellido+"')>"+element.telefono;
+                else
+                addUser+="<span class='name-meta' onclick=Chatear('"+element.telefono+"','"+element.nombre+"','"+element.apellido+"')>"+element.nombre+","+element.apellido;
                 addUser+="</span></div></div></div></div></div>";
                 $('#usuario_chat_disponibles').append(addUser);
             });
@@ -73,67 +59,7 @@ function BuscarPersona()
         console.log(index + ':' + $(value).text());
       });
 }
-//var eventos = L.mapbox.map('map').setView([-38.379956, -60.2484336], 13).addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
 
-var eventos;
- 
- mapboxgl.accessToken = 'pk.eyJ1IjoicXVvZGlpIiwiYSI6ImNrbzBqd3NmdTBkdjkyb21rOHM1MjR4dHIifQ.RX7ilY2PuoFDRmWq1NjBSg';
-eventos= new mapboxgl.Map({
-        container: 'map', // container id
-        style: 'mapbox://styles/mapbox/streets-v8',
-        center: [-65.00855546493587, -35.53476347352089], // starting position
-        zoom: 10 // starting zoom
-        });
-
-eventos.on('load', function () {
-    
-    (function() {
-        var url = "../usuarios/?event=lista_json_chat";
-        $.getJSON(url, { format: "json" })
-            .done(function(data) {
-                devices=data;
-                jQuery.each(data, function(i, val) {
-                    eventos.addSource( val.celular, { type: 'geojson', data: JsonData });
-                    console.log("I:"+i+"- VAL:"+val)
-                    eventos.addLayer({
-                        'id': val.celular,
-                        'type': 'symbol',
-                        'source': val.celular,
-                        'layout': {
-                        'icon-image': 'hospital-15'
-                        }
-                        });
-                  });
-            });
-    })();
-});
-
-/*if ("geolocation" in navigator) { 
-    navigator.geolocation.getCurrentPosition(position => { 
-        eventos = new mapboxgl.Map({
-        // container id specified in the HTML
-          container: 'map',
-
-           // style URL
-           style: 'mapbox://styles/mapbox/streets-v11',
-
-         // initial position in [lon, lat] format
-          center: [position.coords.longitude, position.coords.latitude],
-
-         // initial zoom
-
-         zoom: 13
-        });
-    }); 
-} else { 
-    eventos= new mapboxgl.Map({
-        container: 'map', // container id
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-65.00855546493587, -35.53476347352089], // starting position
-        zoom: 10 // starting zoom
-        });
-        
- }*/
 
 function Chatear(username,nombre,apellido)
 {
