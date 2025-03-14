@@ -1,5 +1,5 @@
 <?php
-
+/****Version 1.0.0*****/
 class dbMysql {
     var $idConnection = "";
     var $idResult = 0;
