@@ -26,9 +26,7 @@ $_SESSION["MYSQL"]["USER"]=getenv("MYSQL_USER");
 $_SESSION["MYSQL"]["PASSWORD"]=getenv("MYSQL_PASSWORD");
 $_SESSION["WHATSAPP"]["PHONE_NUMBER_ID"]=getenv('PHONE_NUMBER_ID');
 $_SESSION["WHATSAPP"]["ACCESS_TOKEN"] = getenv('ACCESS_TOKEN');
-error_log("📞 PHONE_NUMBER_ID sin modificar: " . $_SESSION["WHATSAPP"]["PHONE_NUMBER_ID"]);
-error_log("📞 PHONE_NUMBER_ID sin modificar get directo: " . getenv('PHONE_NUMBER_ID'));
-error_log("User mysql: " . getenv('MYSQL_USER'));
+
 
 $_SESSION["APP"]["NAME"]="CRM";
 $_SESSION["EMPRESA"]["NAME"]="AP Velas & Aromas";
