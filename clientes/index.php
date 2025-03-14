@@ -47,7 +47,8 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			$objchats->field("idcliente", $_POST["idcliente"]);
 			$objchats->field("mensaje", $_POST["mensaje"]);
 			$objchats->field("original_idchat", "549232");
-			$objchats->field("visto", 1);
+			$objchats->field("timestamp", date('Y-m-d H:i:s'));
+						$objchats->field("visto", 1);
 			$objchats->field("sender", "assistant");
 			
 			$whatsapp = new WhatsAppSender();
