@@ -10,9 +10,7 @@ class WhatsAppSender {
         $this->accessToken = $_SESSION["WHATSAPP"]["ACCESS_TOKEN"];
     
         // 🔍 DEBUG: Mostrar los valores en el log
-        error_log("📞 PHONE_NUMBER_ID sin modificar: " . $this->phoneNumberId);
-        error_log("🔑 ACCESS_TOKEN sin modificar: " . $this->accessToken);
-    
+        
         // Verificar que las variables de entorno estén configuradas
         if (!$this->phoneNumberId || !$this->accessToken) {
             error_log("❌ ERROR: Falta PHONE_NUMBER_ID o ACCESS_TOKEN en las variables de entorno.");
