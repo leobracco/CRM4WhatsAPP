@@ -172,12 +172,7 @@ function Chatear(idCliente,telefono) {
     obtenerMensajes(idCliente);
 }
 
-function OpenChat()
-{
-    $("#chat").show();
-    $( "#chat" ).draggable();
-    $( "#chat" ).css({'top': -560, 'left' : -350})
-}
+
 function CloseChat()
 {
     $("#chat").hide();
