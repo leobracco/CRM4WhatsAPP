@@ -50,9 +50,10 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			$objchats->field("sender", "assistant");
 			
 			$whatsapp = new WhatsAppSender();
-$result = $whatsapp->sendMessage($telefono, $mensaje);
+			$result = $whatsapp->sendMessage($telefono, $mensaje);
 
-		
+			if ($result['success']) 
+			$objchats->store();
 				  
 				
 				
