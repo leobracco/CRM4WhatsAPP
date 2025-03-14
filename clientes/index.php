@@ -58,7 +58,8 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 				
 				
 				
-				return $result;
+			header('Content-Type: application/json');
+			echo json_encode($result);
 				break;	
 		case "form":
 			if (!$objCMSUser->checkPermission("Usuarios::escritura"))
