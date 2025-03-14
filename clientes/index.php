@@ -30,7 +30,7 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			return $result;
 			break;
 		case "sender":
-			
+
 			date_default_timezone_set('America/Argentina/Buenos_Aires'); 
 			$objchats = new chats();
 			$objchats->setDB($dbCMS);
@@ -65,23 +65,18 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			echo json_encode($result);
 			exit();
 		case "form":
-			if (!$objCMSUser->checkPermission("Usuarios::escritura"))
-				return handleevent("permission_denied", $objclientes, $objCMSUser);
-
-				$objclientes->enableTables(array("grupos","usuarios_grupos"));
-			$objclientes->fetch($_GET["idusuario"]);
+			$objclientes->fetch($_GET["idcliente"]);
 			
 			
 			
-			$objgrupos = new grupos();
-			$objgrupos->db = $objclientes->db;
-			$objgrupos->where="idgrupo not in (select idgrupo from usuarios_grupos where idusuario=".$_GET["idusuario"].")";
-			$result = $objclientes->doformat("/clientes/edicion.html",  $_SESSION["TEMPLATE"]["TEMPLATE_ROOT"]);
-			$result=$objgrupos->doformatall($result);
+			
 			$dataArr[''] = Array();
-			$dataArr['texto']="Accion realizada correctamente";
-			$dataArr['estado']=1;
-			$dataArr['resultado']=$result;
+			$dataArr['nombre']=$objclientes->values['nombre'];
+			$dataArr['apellido']=$objclientes->values['apellido'];
+			$dataArr['direccion']=$objclientes->values['direccion'];
+			$dataArr['email']=$objclientes->values['email'];
+
+			
 			header('Content-Type: application/json');
 			echo json_encode($dataArr);
 			exit(0);
@@ -116,19 +111,16 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			break;
 
 		case "grabar":
-			if (!$objCMSUser->checkPermission("Usuarios::escritura")) 
-				return handleevent("permission_denied", $objclientes, $objCMSUser);
+	
 			$dataArr[''] = Array();
-// 			echo "grabar";
-// 			$objclientes->field("imagen", $carpeta);
-			$objclientes->field("idusuario", $_GET["idusuario"]);
-			$objclientes->field("username", $_GET["username"]);
-			$objclientes->field("password", $_GET["password"]);
-			$objclientes->field("nombre", $_GET["nombre"]);
-			$objclientes->field("apellido", $_GET["apellido"]);
-			$objclientes->field("email", $_GET["email"]);
+			$objclientes->fetch($_POST["idcliente"]);
+			$objclientes->field("nombre", $_POST["nombre"]);
+			$objclientes->field("apellido", $_POST["apellido"]);
+			$objclientes->field("email", $_POST["email"]);
+			$objclientes->field("telefono", $_POST["telefono"]);
+			$objclientes->field("direccion", $_POST["direccion"]);
 			$objclientes->store();
-			addLog("alerta","El usuario ".$_SESSION["usuarios_username"]." ha grabado Usuarios".$objclientes->ID());
+			//addLog("alerta","El usuario ".$_SESSION["usuarios_username"]." ha grabado Usuarios".$objclientes->ID());
 			$dataArr['texto']="El usuario se grabo correctamente";
 			$dataArr['estado']=1;
 			

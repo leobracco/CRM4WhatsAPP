@@ -585,3 +585,17 @@
 background: #212529 !important;
 color: white !important;
 }
+.cliente-info {
+    background: #f7f7f7;
+    padding: 15px;
+    border-left: 1px solid #ddd;
+    height: 100%;
+    overflow-y: auto;
+}
+
+@media (max-width: 758px) {
+    .cliente-info {
+        border-left: none;
+        border-top: 1px solid #ddd;
+    }
+}

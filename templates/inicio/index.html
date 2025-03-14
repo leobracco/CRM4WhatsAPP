@@ -1,7 +1,7 @@
-<!--main content start-->
+<!-- Main Content Start -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
-<script src='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.css' rel='stylesheet' />
+<script src="https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.js"></script>
+<link href="https://api.mapbox.com/mapbox.js/v3.2.0/mapbox.css" rel="stylesheet" />
 <link rel="stylesheet" href="../css/notifications/Lobibox.min.css">
 <link rel="stylesheet" href="../css/notifications/notifications.css">
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -12,149 +12,121 @@
 <section id="main-content">
     <section class="wrapper">
         <div class="google-maps-area mg-b-15">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-10 col-xs-12">
-                        <div class="sparkline8-list responsive-mg-b-30">
-                            <div class="sparkline8-hd">
-                                <div class="main-sparkline8-hd">
-                                    <h1>Eventos <span class="table-project-n">en</span> Vivo</h1>
-                                </div>
-                            </div>
-                            <div class="sparkline8-graph">
-                                <div class="google-map-single">
-                                    <div id="map"></div>
+          <!-- inicio-->
+          <div class="container app">
+            <div class="row app-one">
+                
+                <!-- 📌 LISTA DE USUARIOS -->
+                <div class="col-sm-3 side">
+                    <div class="side-one">
+                        <div class="row heading"></div>
+                        <div class="row searchBox">
+                            <div class="col-sm-12 searchBox-inner">
+                                <div class="form-group has-feedback">
+                                    <input id="searchText" type="text" class="form-control" name="searchText" placeholder="Buscar cliente">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
                                 </div>
                             </div>
                         </div>
+                        <div class="row sideBar" id="usuario_chat_disponibles"></div>
                     </div>
                 </div>
-                
-
+        
+                <!-- 📌 CHAT -->
+                <div class="col-sm-6 conversation">
+                    <div class="row heading">
+                        <div class="col-sm-2 col-md-1 col-xs-3 heading-avatar">
+                            <div class="heading-avatar-icon">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar6.png">
+                            </div>
+                        </div>
+                        <div class="col-sm-8 col-xs-7 heading-name">
+                            <a class="heading-name-meta"><div id="chatUsuario"></div></a>
+                            <span class="heading-online">Online</span>
+                        </div>
+                        <div class="col-sm-1 col-xs-1 heading-dot pull-right">
+                            <button type="button" class="fa fa-window-close pull-right" onclick="CloseChat()" aria-hidden="true"></button>
+                        </div>
+                    </div>
+        
+                    <div class="row message" id="conversation" telefono="">
+                        <div id="mensajesChat" class="row message-body"></div>
+                    </div>
+        
+                    <div class="row reply">
+                        <div class="col-sm-9 col-xs-9 reply-main">
+                            <input type="text" class="form-control" rows="1" id="mensaje" placeholder="Escribí tu mensaje">
+                        </div>
+                        <div class="col-sm-1 col-xs-1 reply-send">
+                            <i class="fa fa-send fa-2x" onclick="SendMensaje()" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- 📌 FORMULARIO DE EDICIÓN DEL CLIENTE -->
+                <div class="col-sm-2 cliente-info">
+                    <h4>Datos del Cliente</h4>
+                    <form id="clienteForm">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" placeholder="Nombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" placeholder="Apellido">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Email">
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" placeholder="Dirección">
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="guardarCliente()">Guardar</button>
+                    </form>
+                </div>
+        
             </div>
+        </div>
+        
+           <!-- fin -->
+        
         </div>
     </section>
 </section>
 
-
-<div id="chat"  username=""   class="col-lg-4 col-md-4 col-sm-10 col-xs-12">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<div class="container app">
-  <div class="row app-one">
-    <div class="col-sm-4 side">
-      <div class="side-one">
-        <div class="row heading">
-          
-       
-          
-         
-        </div>
-
-        <div class="row searchBox">
-          <div class="col-sm-12 searchBox-inner">
-            <div class="form-group has-feedback">
-              <input id="searchText" type="text" class="form-control" name="searchText" placeholder="Search">
-              <span class="glyphicon glyphicon-search form-control-feedback"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="row sideBar"  id="usuario_chat_disponibles">
-          
-        </div>
-        
-      </div>
-
-     
-    </div>
-
-    <div class="col-sm-8 conversation">
-      <div class="row heading">
-        <div class="col-sm-2 col-md-1 col-xs-3 heading-avatar">
-          <div class="heading-avatar-icon">
-            <img src="https://bootdey.com/img/Content/avatar/avatar6.png">
-          </div>
-        </div>
-        <div class="col-sm-8 col-xs-7 heading-name">
-          <a class="heading-name-meta"><div id="chatUsuario"></div></a>
-          <span class="heading-online">Online</span>
-        </div>
-        <div class="col-sm-1 col-xs-1  heading-dot pull-right">
-            <button type="button" class="fa fa-window-close  pull-right" onclick="CloseChat()" aria-hidden="true"></button>
-        
-        </div>
-      </div>
-
-      <div class="row message" id="conversation" telefono="">
-        
-
-        <div id="mensajesChat" class="row message-body">
-         
-        </div>
-
-      </div>
-
-      <div class="row reply">
-        <!--div class="col-sm-1 col-xs-1 reply-emojis">
-          <i class="fa fa-smile-o fa-2x"></i>
-        </div-->
-        <div class="col-sm-9 col-xs-9 reply-main">
-          <input type="text" class="form-control" rows="1" id="mensaje"></input>
-        </div>
-        <!--div class="col-sm-1 col-xs-1 reply-recording">
-          <i class="fa fa-microphone fa-2x" aria-hidden="true"></i>
-        </div-->
-        <div class="col-sm-1 col-xs-1 reply-send">
-          <i class="fa fa-send fa-2x" onclick="SendMensaje()" aria-hidden="true"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
-<!--main content end-->
+<!-- Main Content End -->
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
 <script src="../js/mqtt/mqttws31.js?time={random}" type="text/javascript"></script>
 <script src="../js/notifications/Lobibox.js"></script>
-<!--script src="../js/google.maps/google.maps-active.js"></script-->
 <script src="../js/whatsapp.js"></script>
 
-
-
-
-
 <script type="application/javascript">
-$(function(){
+$(function() {
     $(".heading-compose").click(function() {
-      $(".side-two").css({
-        "left": "0"
-      });
+        $(".side-two").css({ "left": "0" });
     });
 
     $(".newMessage-back").click(function() {
-      $(".side-two").css({
-        "left": "-100%"
-      });
+        $(".side-two").css({ "left": "-100%" });
     });
-})
-$(document).keypress(
-  function(event){
-    if (event.which == '13') {
-        SendMensaje();
-      event.preventDefault();
-    }
-});
- $( function() {
-    $( "#draggable" ).draggable();
-  } );
-  $( "#draggable" ).css({'top': -810, 'left' : 1020})
-   
 
-    function myNavFunction(id) {
-        $("#date-popover").hide();
-        var nav = $("#" + id).data("navigation");
-        var to = $("#" + id).data("to");
-        console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
-    }
+    $(document).keypress(function(event) {
+        if (event.which == '13') {
+            SendMensaje();
+            event.preventDefault();
+        }
+    });
+
+    $("#draggable").draggable();
+    $("#draggable").css({'top': -810, 'left': 1020});
+});
+
+function myNavFunction(id) {
+    $("#date-popover").hide();
+    var nav = $("#" + id).data("navigation");
+    var to = $("#" + id).data("to");
+    console.log('nav ' + nav + ' to: ' + to.month + '/' + to.year);
+}
 </script>
