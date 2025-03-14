@@ -6,28 +6,19 @@ class WhatsAppSender {
 
     public function __construct() {
         // Obtener variables de entorno
-        // Registrar en error_log para verificar si las variables se están obteniendo correctamente
-        error_log("🔍 DEBUG: Iniciando WhatsAppSender...");
-
-        if (!isset($_SESSION["WHATSAPP"]["PHONE_NUMBER_ID"]) || !isset($_SESSION["WHATSAPP"]["ACCESS_TOKEN"])) {
-            error_log("❌ ERROR: Las variables de sesión no están definidas.");
-            error_log("📌 SESSION CONTENT: " . print_r($_SESSION, true));
-            throw new Exception("❌ ERROR: PHONE_NUMBER_ID o ACCESS_TOKEN no están configurados.");
-        }
-
         $this->phoneNumberId = $_SESSION["WHATSAPP"]["PHONE_NUMBER_ID"];
         $this->accessToken = $_SESSION["WHATSAPP"]["ACCESS_TOKEN"];
-
-        
-
-
-        // Ocultar parte del token por seguridad
-        $maskedToken = substr($this->accessToken, 0, 4) . '...' . substr($this->accessToken, -4);
-        $maskedPhoneId = substr($this->phoneNumberId, 0, 2) . '...' . substr($this->phoneNumberId, -2);
-
-        error_log("📞 PHONE_NUMBER_ID: {$maskedPhoneId}");
-        error_log("🔑 ACCESS_TOKEN: {$maskedToken}");
-
+    
+        // 🔍 DEBUG: Mostrar los valores en el log
+        error_log("📞 PHONE_NUMBER_ID sin modificar: " . $this->phoneNumberId);
+        error_log("🔑 ACCESS_TOKEN sin modificar: " . $this->accessToken);
+    
+        // Verificar que las variables de entorno estén configuradas
+        if (!$this->phoneNumberId || !$this->accessToken) {
+            error_log("❌ ERROR: Falta PHONE_NUMBER_ID o ACCESS_TOKEN en las variables de entorno.");
+            throw new Exception("❌ ERROR: PHONE_NUMBER_ID o ACCESS_TOKEN no están configurados.");
+        }
+    
         // Construir la URL de la API de WhatsApp
         $this->apiUrl = "https://graph.facebook.com/v18.0/{$this->phoneNumberId}/messages";
     }
