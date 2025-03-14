@@ -30,7 +30,8 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			return $result;
 			break;
 		case "sender":
-				
+			
+			date_default_timezone_set('America/Argentina/Buenos_Aires'); 
 			$objchats = new chats();
 			$objchats->setDB($dbCMS);
 			$idcliente = $_POST['idcliente'];

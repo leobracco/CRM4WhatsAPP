@@ -2,6 +2,7 @@
 //error_reporting(0);
 setlocale (LC_ALL, 'es-ar');
 date_default_timezone_set('America/Argentina/Buenos_Aires');
+
 if (PHP_MAJOR_VERSION >= 7) {
     set_error_handler(function ($errno, $errstr) {
        return strpos($errstr, 'Declaration of') === 0;
