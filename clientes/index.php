@@ -46,6 +46,7 @@ function handleevent($event, &$objclientes, &$objCMSUser,$dbCMS)
 			//idchat 	idcliente 	mensaje 	original_idchat 	timestamp 	visto 	sender 	
 			$objchats->field("idcliente", $_POST["idcliente"]);
 			$objchats->field("mensaje", $_POST["mensaje"]);
+			$objchats->field("original_idchat", "549232");
 			$objchats->field("visto", 1);
 			$objchats->field("sender", "assistant");
 			
