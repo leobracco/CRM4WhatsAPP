@@ -1,0 +1,50 @@
+chartjs-sample
+# Ignorar archivos de entorno
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignorar dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignorar logs
+logs/
+*.log
+yarn-debug.log*
+lerna-debug.log*
+
+# Ignorar compilados de TypeScript
+*.tsbuildinfo
+
+# Ignorar archivos de salida de compilación
+dist/
+build/
+out/
+
+# Ignorar archivos de configuración del editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Ignorar dependencias de Python (si aplica)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar carpetas de IDEs
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de control de versión de paquetes
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
