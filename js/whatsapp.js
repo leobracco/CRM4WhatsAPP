@@ -48,6 +48,7 @@ function cargarMensajes(mensajes) {
     let nuevosMensajes = "";
 
     mensajes.forEach(mensaje => {
+        console.log("Sender:"+mensaje.sender)
         let horaFormato = formatDate(mensaje.timestamp);
         let htmlMensaje = `
             <div class='col-sm-12 message-main-${mensaje.sender === "user" ? "sender" : "receiver"}'>
