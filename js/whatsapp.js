@@ -64,15 +64,23 @@ function cargarMensajes(mensajes) {
     contenedorMensajes.scrollTop(contenedorMensajes[0].scrollHeight); // Hacer scroll al final
 }
 
-// 📌 Obtener mensajes nuevos del chat actual
+
+
 function obtenerMensajes(id) {
     idCliente = id;
-    $.getJSON(`/clientes/?event=chats&idcliente=${id}`, function (response) {
+
+    // Si es la primera vez que abrimos el chat, inicializar su última actualización
+    if (!ultimaActualizacion[idCliente]) {
+        ultimaActualizacion[idCliente] = 0;
+    }
+
+    $.getJSON(`/clientes/?event=chats&idcliente=${idCliente}`, function (response) {
         let ultimoMensaje = response.length ? new Date(response[response.length - 1].timestamp).getTime() : 0;
 
-        if (ultimoMensaje > ultimaActualizacion) {
+        // Siempre cargar los mensajes al cambiar de chat
+        if (ultimoMensaje !== ultimaActualizacion[idCliente]) {
             cargarMensajes(response);
-            ultimaActualizacion = ultimoMensaje; // Actualizar el timestamp más reciente
+            ultimaActualizacion[idCliente] = ultimoMensaje;
         }
     });
 }
@@ -87,7 +95,7 @@ function obtenerDatosCliente(id) {
         $("#telefono").val(response.telefono);
         $("#direccion").val(response.direccion);
     });
-    obtenerMensajes(id);
+    
 }
 
 // 📌 Configurar el número de teléfono en el chat
@@ -95,12 +103,16 @@ function setTelefono(telefono) {
     document.getElementById("conversation").setAttribute("telefono", telefono);
 }
 
-// 📌 Función para abrir el chat con un usuario
+// 📌 Modificar `Chatear()` para limpiar `ultimaActualizacion` y forzar la recarga de mensajes
 function Chatear(idCliente, telefono) {
     setTelefono(telefono);
     $('#chat').show();
     obtenerDatosCliente(idCliente);
-   
+
+    // Resetear última actualización para que siempre cargue los mensajes desde cero
+    ultimaActualizacion[idCliente] = 0;
+
+    obtenerMensajes(idCliente);
 }
 
 // 📌 Cerrar chat
@@ -175,11 +187,11 @@ function guardarCliente() {
 // 📌 Inicializar funciones cuando la página carga
 $(document).ready(function () {
     actualizarUsuarios();
-    /*setInterval(() => {
+    setInterval(() => {
         actualizarUsuarios();
         if (idCliente) obtenerMensajes(idCliente);
     }, 5000); // Actualiza cada 5 segundos
-    */
+    
     $('#tabla').DataTable({
         "language": { "url": "../js/Spanish.json" },
         "order": [[3, "desc"]],
