@@ -51,8 +51,8 @@ function cargarMensajes(mensajes) {
         console.log("Sender:"+mensaje.sender)
         let horaFormato = formatDate(mensaje.timestamp);
         let htmlMensaje = `
-            <div class='col-sm-12 message-main-${mensaje.sender === "user" ? "sender" : "receiver"}'>
-                <div class='${mensaje.sender === "user" ? "sender" : "receiver"}'>
+            <div class='col-sm-12 message-main-${mensaje.sender === "assistant" ? "sender" : "receiver"}'>
+                <div class='${mensaje.sender === "assistant" ? "sender" : "receiver"}'>
                     <div class='message-text'>${mensaje.mensaje}</div>
                     <span class='message-time pull-right'>${horaFormato}</span>
                 </div>
