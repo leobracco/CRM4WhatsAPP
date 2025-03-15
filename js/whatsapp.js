@@ -175,11 +175,11 @@ function guardarCliente() {
 // 📌 Inicializar funciones cuando la página carga
 $(document).ready(function () {
     actualizarUsuarios();
-    setInterval(() => {
+    /*setInterval(() => {
         actualizarUsuarios();
         if (idCliente) obtenerMensajes(idCliente);
     }, 5000); // Actualiza cada 5 segundos
-
+    */
     $('#tabla').DataTable({
         "language": { "url": "../js/Spanish.json" },
         "order": [[3, "desc"]],
