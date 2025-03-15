@@ -87,6 +87,7 @@ function obtenerDatosCliente(id) {
         $("#telefono").val(response.telefono);
         $("#direccion").val(response.direccion);
     });
+    obtenerMensajes(id);
 }
 
 // 📌 Configurar el número de teléfono en el chat
@@ -99,7 +100,7 @@ function Chatear(idCliente, telefono) {
     setTelefono(telefono);
     $('#chat').show();
     obtenerDatosCliente(idCliente);
-    obtenerMensajes(idCliente);
+   
 }
 
 // 📌 Cerrar chat
