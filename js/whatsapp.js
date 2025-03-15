@@ -57,6 +57,7 @@ function cargarMensajes(mensajes) {
                     <span class='message-time pull-right'>${horaFormato}</span>
                 </div>
             </div>`;
+            console.log("HTML:"+htmlMensaje)
         nuevosMensajes += htmlMensaje;
     });
 
