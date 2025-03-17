@@ -56,7 +56,7 @@ elseif ($_POST['email'] && $_POST['password'])
 			$_SESSION["usuarios_username"]=$objCMSUser->values['username'];
 			
 			$objLog  = new Eventlog();
-			$objLog->db = $dbCMS;
+			$objLog->setDB($dbCMS);
 			$objLog->field("timestamp", date("Y-m-d H:i:s"));
 			$objLog->field("evento", "Informacion");
 			$objLog->field("texto", "<b>".$objCMSUser->values['username']."</b> ha ingresado al sistema desde ".$_SERVER['REMOTE_ADDR']);

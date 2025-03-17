@@ -128,30 +128,7 @@
 <!--sidebar end-->
 <script src="../js/inicio.js"></script>
 <script>
-    $(document).ready(function() {
-
-
-        $(".permiso").each(function() {
-
-            var obj = $(this);
-            $.get("/usuarios/?event=check", {
-                    nombre: $(this).attr('value')
-                })
-                .done(function(data) {
-
-                    if (data.permiso == 0) {
-                        var Perm;
-                        Perm = obj.attr('value');
-
-                        Perm = Perm.split("::")
-                        $("#" + Perm[0] + Perm[1]).css("display", "none");
-
-                    }
-
-                });
-        });
-
-    });
+ 
 
     var Script = function() {
 

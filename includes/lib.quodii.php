@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 
 if (!isset($_SESSION["TEMPLATE"]["APP_INCLUDEPATH"])) {
     error_log("⚠️ ERROR: APP_INCLUDEPATH no está definido en SESSION.");
@@ -44,6 +44,15 @@ class usuarios extends objdb {
             return false;
         }
     }
+    function checkPermission($nombre="") 
+	{
+		$sql = "SELECT count(*) as permisook FROM usuarios as u, usuarios_grupos as ug, grupos_permisos as gp, permisos as p WHERE u.idusuario=ug.idusuario AND ug.idgrupo=gp.idgrupo AND gp.idpermiso=p.idpermiso AND u.idusuario='".$this->ID()."' AND p.nombre='$nombre'";
+		$this->db->exec($sql);
+		if ($this->debug) print "$sql (Error=".$this->db->Error.")";
+
+		if ($this->db->getrow() && $this->db->Fields["permisook"]>0) { return 1;} else { return 0;}
+	}
+
 }
 
 /**
@@ -116,23 +125,28 @@ class grupos_permisos extends objdb {
 /**
  * Clase Eventlog
  */
-class eventlog extends objdb {
+class eventlog extends objdb 
+{
     function __construct() {
         parent::__construct();
-        $this->table = 'eventlog';
-        $this->name = $this->table;
-        $this->fields = ['id', 'timestamp', 'evento', 'texto'];
+        $this->table    = 'eventlog';
+        $this->name     = $this->table;
+        $this->fields   = ['id', 'timestamp', 'evento', 'texto'];
         $this->initialize();
+    }
+
+    // ✅ Método para asignar la base de datos correctamente
+    public function setDB($db) {
+        $this->db = $db;
     }
 
     public function &fetch($ID = null) {
         $values = parent::fetch($ID);
-        if ($values) {
-            $values['timestamp.nice'] = date("d-m-Y", strtotime($values['timestamp']));
-        }
-        return $values;
+        $this->values['timestamp.nice'] = date("d-m-Y", strtotime($this->values['timestamp']));
+        return $this->values;
     }
 }
+
 
 /**
  * Clase Clientes
@@ -148,6 +162,25 @@ class clientes extends objdb {
 
     function ID_field() {
         return 'idcliente';
+    }
+    /**
+     * Obtener la lista de clientes con su último mensaje en el chat, ordenados del más reciente al más antiguo.
+     */
+    function obtenerClientesConMensajesRecientes() {
+        $sql = "
+            SELECT c.idcliente, cl.nombre, cl.apellido, cl.telefono, cl.email, cl.direccion, 
+                   c.mensaje, c.timestamp
+            FROM clientes cl
+            LEFT JOIN (
+                SELECT idcliente, mensaje, timestamp
+                FROM chats
+                WHERE timestamp = (SELECT MAX(timestamp) FROM chats WHERE chats.idcliente = c.idcliente)
+            ) c ON cl.idcliente = c.idcliente
+            ORDER BY c.timestamp DESC;
+        ";
+
+        $this->db->exec($sql);
+        return $this->db->fetchall();
     }
 }
 
@@ -165,6 +198,27 @@ class chats extends objdb {
 
     function ID_field() {
         return 'idchat';
+    }
+}
+/**
+ * Clase Chats Clientes
+ */
+
+class chat_clientes extends objdb {
+    function __construct() {
+        parent::__construct();
+        $this->table = 'vista_clientes_chat'; // Usamos la vista creada
+        $this->name = $this->table;
+        $this->fields = ['idcliente', 'nombre', 'apellido', 'telefono'];
+        $this->initialize();
+    }
+
+    function ID_field() {
+        return 'idcliente';
+    }
+
+    function listarClientes() {
+        return $this->fetchall();
     }
 }
 
@@ -239,16 +293,23 @@ class lista_precios extends objdb {
 /**
  * Función para agregar eventos al log
  */
-function addLog($evento, $texto) {
+
+
+ function addLog($evento, $texto) {
+    // Crear conexión a la base de datos
     $dbCMS = new objdb();
     $dbCMS->connect();
     
+    // Crear instancia de eventlog y asignar la BD usando setDB()
     $tmp = new eventlog();
-    $tmp->db = $dbCMS;
-    
+    $tmp->setDB($dbCMS); // ✅ Asignamos la BD correctamente
+
+    // Insertar en la tabla eventlog
     $tmp->field("timestamp", date("Y-m-d H:i:s"));
     $tmp->field('evento', $evento);
     $tmp->field('texto', $texto);
     $tmp->store();
 }
+
+
 ?>

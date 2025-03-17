@@ -1,22 +1,4 @@
 <?php
-//
-// Copyright (C) 2000-2006 Garcia Rodrigo.
-// All rights reserved.
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, US
-//
 
 $OBJDB_CACHE = array();
 
@@ -122,7 +104,7 @@ class objdb
 	function join($name, $join=NULL)
 	{
 		if (isset($join)) {$this->joins[$name] = $join;}
-		return $self->joins[$name];
+		return $this->joins[$name];
 	}
 	
 	#**************************************
@@ -186,7 +168,7 @@ class objdb
 		foreach ($this->joins as $name => $j) {
 			$obj = $j->obj();
 			if (!$obj) {
-				error_log("ERROR>> fetch(): No se pudo inicializar objeto de relación '{$name}' en '{$this->table}'.");
+				error_log("ERROR>> fetch(): No se pudo inicializar objeto de relación '{$name}' en '{$this->table}' class.objdb.php.");
 				continue;
 			}
 	
@@ -479,7 +461,7 @@ class Join
 			if (class_exists($this->class)) {
 				$this->_obj = new $this->class();
 			} else {
-				error_log("ERROR>> La clase {$this->class} no existe.");
+				error_log("ERROR>> La clase {$this->class} no existe. class.objdb.php");
 				$this->_obj = null;
 			}
 		}
