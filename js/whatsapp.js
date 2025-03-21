@@ -236,7 +236,7 @@ $(document).ready(function () {
     actualizarUsuarios();
     setInterval(() => {
         actualizarUsuarios();
-        //if (idCliente) obtenerMensajes(idCliente);
+        if (idCliente) obtenerMensajes(idCliente);
     }, 5000); // Actualiza cada 5 segundos
     
     $('#tabla').DataTable({
