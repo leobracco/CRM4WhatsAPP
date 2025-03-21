@@ -1,0 +1,167 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal">{usuarios.nombre}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="form-panel">
+                    <form class="form-horizontal style-form">
+                        <input type="hidden" id="idusuario" value="{usuarios.idusuario}">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Nombre</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{usuarios.nombre}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Apellido</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="apellido" name="descripcion" value="{usuarios.apellido}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Email</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="email" name="descripcion" value="{usuarios.email}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Password</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="password" name="descripcion" value="{usuarios.password}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-2 control-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="username" name="descripcion" value="{usuarios.username}" readonly>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row mt">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Grupos disponibles</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <select class="form-control" id="idgrupos_agregar" multiple>
+                                        <!-- BEGIN grupos.Row -->
+                                                <option value="{grupos.idgrupo}">{grupos.nombre}</option>
+                                        <!-- END grupos.Row -->
+                                    </select>
+                            </div>
+                            <button type="button" id="agregar" class="btn btn-primary">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Grupos agregados</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <form role="form">
+                                <div class="form-group">
+
+
+                                    <select class="form-control" id="grupos_permisos" multiple>
+                                    <!-- BEGIN usuarios.grupos.Row -->
+                                            <option value="{usuarios.grupos.id}">{usuarios.grupos.grupo.nombre}</option>
+                                    <!-- END usuarios.grupos.Row -->
+                                </select>
+                                </div>
+                                <button type="button" id="eliminar" class="btn btn-primary">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="button" id="grabar" class="btn btn-primary">Grabar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $("#grabar").click(function() {
+        $.get("/permisos/?event=grabar", {
+                idpermiso: $("#idpermiso").val(),
+                nombre: $("#nombre").val(),
+                descripcion: $("#descripcion").val()
+            })
+            .done(function(data) {
+                table.ajax.reload();
+                $('#modal').modal('hide');
+
+
+            });
+
+    });
+    $("#agregar").click(function() {
+        if ($("#idusuario").val() != '')
+            $.get("/usuarios/?event=grupo_grabar", {
+                idusuario: $("#idusuario").val(),
+                idgrupos_agregar: $("#idgrupos_agregar").val()
+            })
+            .done(function(data) {
+                $("#idgrupos_agregar").empty();
+                $.each(data['gruposDisponibles'], function(i, item) {
+
+                    $("#idgrupos_agregar").append($("<option>", {
+                        value: item.idgrupo,
+                        text: item.nombre
+                    }));
+                });
+                $("#grupos_permisos").empty();
+                $.each(data['gruposAgregados'], function(i, item) {
+
+                    $("#grupos_permisos").append($("<option>", {
+                        value: item.idgrupo,
+                        text: item.nombre
+                    }));
+                });
+            });
+        else {
+            alert("Grabe el usuario primero")
+        }
+
+    });
+    $("#eliminar").click(function() {
+
+        $.get("/usuarios/?event=grupo_borrar", {
+                idusuario: $("#idusuario").val(),
+                grupos_permisos: $("#grupos_permisos").val()
+            })
+            .done(function(data) {
+                $("#idgrupos_agregar").empty();
+                $.each(data['gruposDisponibles'], function(i, item) {
+
+                    $("#idgrupos_agregar").append($("<option>", {
+                        value: item.idgrupo,
+                        text: item.nombre
+                    }));
+                });
+                $("#grupos_permisos").empty();
+                $.each(data['gruposAgregados'], function(i, item) {
+
+                    $("#grupos_permisos").append($("<option>", {
+                        value: item.idgrupo,
+                        text: item.nombre
+                    }));
+                });
+            });
+
+
+    });
+</script>

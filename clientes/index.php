@@ -41,16 +41,9 @@ function handleevent($event, &$objclientes, &$objCMSUser, $dbCMS) {
             }
 
             $result = $objclientes->doformat("/clientes/index.html", $_SESSION["TEMPLATE"]["TEMPLATE_ROOT"]);
-            $tpllist = new Template($result);
-
-            // Asignar filtros
-            $filtros = ['nombre', 'apellido', 'username', 'email', 'telefono'];
-            foreach ($filtros as $filtro) {
-                $tpllist->setVar("{filtro_$filtro}", $_SESSION["filter_$filtro"] ?? '');
-            }
-
-            return $tpllist->Template;
-
+            
+            return $result;
+			break;
         case "sender":
             if (!$objCMSUser->checkPermission("Clientes::enviar")) {
                 return handleevent("permission_denied", $objclientes, $objCMSUser, $dbCMS);
@@ -156,7 +149,55 @@ function handleevent($event, &$objclientes, &$objCMSUser, $dbCMS) {
             header('Content-Type: application/json');
             echo json_encode($clientes);
             exit;
-
+		case "lista_json":
+					if (!$objCMSUser->checkPermission("Clientes::lectura")) {
+						return handleevent("permission_denied", $objclientes, $objCMSUser, $dbCMS);
+					}
+		
+			
+	
+				$dataArr[''] = Array();
+				$dataArr['recordsTotal']=$objclientes->count();
+				
+				$objclientes->limit_from=$_GET['offset'];
+				$objclientes->limit_count=$_GET['limit'];
+				if ($_GET['order']=='desc')
+				$_GET['order']="DESC";
+				else 
+				$_GET['order']	="ASC";
+				$objclientes->where=1;
+				if (isset($_GET["sort"]) && isset($_GET["order"]))
+				$objclientes->order_by=$_GET['sort'] ." ". $_GET['order'];
+				if (isset($_GET["limit"]))
+				$objclientes->limit_count=$_GET['limit'];
+				if (isset($_GET["search"]))
+				$objclientes->where.=" AND keyToken LIKE '%".$_GET["search"]."%'";
+				$dataArr['recordsFiltered']=$objclientes->count();
+				
+				foreach ($objclientes->fetchall() as $row)
+				  { 
+					$r = Array();
+					$r['nombre'] = $row['nombre'];
+					$r['apellido'] = $row['apellido'];
+					$r['username'] = $row['telefono'];
+					$r['email'] = $row['email'];
+					$r['herramientas'] = "
+					<button class='btn btn-success btn-xs' id='editar' title='Editar' value='".$row['idcliente']."'>
+					<img src='../img/icons/edit.png'>
+					</button>
+					<button class='btn btn-danger btn-xs' id='borrar' title='Borrar' value='".$row['idcliente']."'>
+					<img src='../img/icons/delete.png'>
+					</button>
+						";
+					
+					$dataArr['data'][] = $r;
+				  }						
+				  
+				 header('Content-Type: application/json');
+				 echo json_encode($dataArr);
+						
+				exit();
+				break;
         case "chats":
             if (!$objCMSUser->checkPermission("Clientes::lectura")) {
                 return handleevent("permission_denied", $objclientes, $objCMSUser, $dbCMS);
@@ -199,7 +240,7 @@ $tplsider->setFileRoot($_SESSION["TEMPLATE"]["TEMPLATE_ROOT"]);
 $tplsider->Open("/sider.html");
 
 // Insertar contenido en la plantilla principal
-$tplmarco->setVar("{page.title}", "IOT Usuarios - Quodii SAS");
+$tplmarco->setVar("{page.title}", "Clientes - ".$_SESSION["EMPRESA"]["NAME"]);
 $tplmarco->setVar("{page.header}", $tplheader->Template);
 $tplmarco->setVar("{page.sider}", $tplsider->Template);
 $tplmarco->setVar("{page.contenido}", handleevent($_GET["event"] ?? "index", $objclientes, $objCMSUser, $dbCMS));

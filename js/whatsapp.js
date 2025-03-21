@@ -16,20 +16,20 @@ function actualizarUsuarios() {
             const displayName = (nombre === "" && apellido === "") ? telefono : `${nombre}, ${apellido}`;
 
             userListHTML += `
-                <div class="row sideBar-body" style="display:block" celular="${idcliente}" nombre="${nombre}" apellido="${apellido}">
-                    <div class="col-sm-3 col-xs-3 sideBar-avatar">
-                        <div class="avatar-icon">
-                            <img src="../img/icons/person.png">
-                        </div>
-                    </div>
-                    <div class="col-sm-9 col-xs-9 sideBar-main">
-                        <div class="row">
-                            <span class="name-meta" onclick="Chatear('${idcliente}', '${telefono}')">
-                                ${displayName}
-                            </span>
-                        </div>
-                    </div>
-                </div>`;
+    <div class="row sideBar-body" style="display:block" celular="${idcliente}" nombre="${nombre}" apellido="${apellido}" onclick="Chatear(this, '${idcliente}', '${telefono}')">
+        <div class="col-sm-3 col-xs-3 sideBar-avatar">
+            <div class="avatar-icon">
+                <img src="../img/icons/person.png">
+            </div>
+        </div>
+        <div class="col-sm-9 col-xs-9 sideBar-main">
+            <div class="row">
+                <span class="name-meta">
+                    ${displayName}
+                </span>
+            </div>
+        </div>
+    </div>`;
         });
 
         $('#usuario_chat_disponibles').html(userListHTML);
@@ -48,21 +48,56 @@ function cargarMensajes(mensajes) {
     let nuevosMensajes = "";
 
     mensajes.forEach(mensaje => {
-        console.log("Sender:"+mensaje.sender)
         let horaFormato = formatDate(mensaje.timestamp);
+        let contenidoMensaje = "";
+
+        // Verificar si el mensaje es multimedia
+        if (mensaje.tipo === 'image') {
+            // Mostrar una imagen
+            contenidoMensaje = `
+                <div class="message-media">
+                    <img src="/uploads/${mensaje.archivo}" alt="Imagen" class="img-responsive" style="max-width: 100%; height: auto;">
+                </div>`;
+        } else if (mensaje.tipo === 'document') {
+            // Mostrar un enlace para descargar el documento
+            contenidoMensaje = `
+                <div class="message-media">
+                    <a href="/uploads/${mensaje.archivo}" target="_blank" class="btn btn-primary">
+                        <i class="fa fa-download"></i> Descargar documento
+                    </a>
+                </div>`;
+        } else if (mensaje.tipo === 'audio') {
+            // Mostrar un reproductor de audio
+            contenidoMensaje = `
+                <div class="message-media">
+                    <audio controls>
+                        <source src="/uploads/${mensaje.archivo}" type="audio/mpeg">
+                        Tu navegador no soporta la reproducción de audio.
+                    </audio>
+                </div>`;
+        } else {
+            // Mostrar un mensaje de texto normal
+            contenidoMensaje = `<div class='message-text'>${mensaje.mensaje}</div>`;
+        }
+
+        // Construir el HTML del mensaje
         let htmlMensaje = `
-            <div class='col-sm-12 message-main-${mensaje.sender === "assistant" ? "sender" : "receiver"}'>
-                <div class='${mensaje.sender === "assistant" ? "sender" : "receiver"}'>
-                    <div class='message-text'>${mensaje.mensaje}</div>
+            <div class='col-sm-12 message-main-${["assistant", "human"].includes(mensaje.sender) ? "sender" : "receiver"}'>
+                <div class='${["assistant", "human"].includes(mensaje.sender) ? "sender" : "receiver"}'>
+                    ${contenidoMensaje}
                     <span class='message-time pull-right'>${horaFormato}</span>
                 </div>
             </div>`;
-            console.log("HTML:"+htmlMensaje)
+
         nuevosMensajes += htmlMensaje;
     });
 
-    contenedorMensajes.html(nuevosMensajes); // Reemplazar contenido en vez de añadir duplicados
-    contenedorMensajes.scrollTop(contenedorMensajes[0].scrollHeight); // Hacer scroll al final
+    // Actualizar el contenedor de mensajes
+    contenedorMensajes.html(nuevosMensajes);
+
+    // Hacer scroll al final del contenedor
+    let contenedor = $('#conversation');
+    contenedor.scrollTop(contenedor[0].scrollHeight);
 }
 
 
@@ -105,15 +140,26 @@ function setTelefono(telefono) {
 }
 
 // 📌 Modificar `Chatear()` para limpiar `ultimaActualizacion` y forzar la recarga de mensajes
-function Chatear(idCliente, telefono) {
+function Chatear(element, idcliente, telefono) {
     setTelefono(telefono);
+    if (!element) return;
+
+    // Quitar la clase 'active-chat' de todos los chats antes de aplicar la nueva selección
+    $(".sideBar-body").removeClass("active-chat");
+
+    // Agregar la clase 'active-chat' solo al chat clickeado
+    $(element).addClass("active-chat");
     $('#chat').show();
-    obtenerDatosCliente(idCliente);
+    obtenerDatosCliente(idcliente);
 
     // Resetear última actualización para que siempre cargue los mensajes desde cero
-    ultimaActualizacion[idCliente] = 0;
+    ultimaActualizacion[idcliente] = 0;
 
-    obtenerMensajes(idCliente);
+    obtenerMensajes(idcliente);
+    setTimeout(() => {
+        let contenedorMensajes = $('#conversation');
+        contenedorMensajes.scrollTop(contenedorMensajes.prop("scrollHeight"));
+    }, 100); // Se puede ajustar el tiempo si es necesario
 }
 
 // 📌 Cerrar chat
@@ -190,7 +236,7 @@ $(document).ready(function () {
     actualizarUsuarios();
     setInterval(() => {
         actualizarUsuarios();
-        if (idCliente) obtenerMensajes(idCliente);
+        //if (idCliente) obtenerMensajes(idCliente);
     }, 5000); // Actualiza cada 5 segundos
     
     $('#tabla').DataTable({

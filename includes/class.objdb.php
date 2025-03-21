@@ -134,6 +134,8 @@ class objdb
 			return $this->values;
 		}
 	
+		error_log("DEBUG>> fetch(): Cargando datos de '{$this->table}' con ID={$ID}");
+	
 		// Verificar si el dato está en caché y sigue siendo válido
 		if ($this->cache && isset($OBJDB_CACHE[$this->table][$ID]) &&
 			time() - $OBJDB_CACHE[$this->table][$ID]['time'] <= $this->cache_ttl) {
@@ -142,14 +144,16 @@ class objdb
 			$OBJDB_CACHE[$this->table][$ID]['time'] = time();
 			$this->values = $OBJDB_CACHE[$this->table][$ID]['values'];
 		} else {
-			// Construir la consulta
+			// Construir la consulta SQL
 			$fields = array_map(fn($field) => "{$this->table}.$field", $this->fields);
 			$sql = "SELECT " . implode(",", $fields) . " FROM {$this->table} WHERE {$this->ID_field()} = '{$ID}'";
+	
+			error_log("DEBUG>> Ejecutando SQL: {$sql}");
 	
 			// Ejecutar la consulta
 			if (!$this->db->exec($sql)) {
 				error_log("ERROR>> fetch(): Falló la consulta SQL: {$sql} - " . $this->db->Error);
-				return $this->values; // Retorna array vacío
+				return $this->values;
 			}
 	
 			// Obtener los datos
@@ -158,6 +162,7 @@ class objdb
 				$this->values = $row;
 				$OBJDB_CACHE[$this->table][$ID]['values'] = $this->values;
 				$OBJDB_CACHE[$this->table][$ID]['time'] = time();
+				error_log("DEBUG>> fetch(): Datos cargados correctamente para ID={$ID}");
 			} else {
 				error_log("ERROR>> fetch(): No se encontraron datos para ID={$ID} en la tabla '{$this->table}'.");
 				return $this->values; // Retorna array vacío si no hay datos
@@ -166,38 +171,45 @@ class objdb
 	
 		// Manejar relaciones y joins
 		foreach ($this->joins as $name => $j) {
-			$obj = $j->obj();
-			if (!$obj) {
-				error_log("ERROR>> fetch(): No se pudo inicializar objeto de relación '{$name}' en '{$this->table}' class.objdb.php.");
-				continue;
-			}
+    error_log("DEBUG>> Procesando relación: '{$name}' en '{$this->table}'");
+
+    $obj = $j->obj();
+    if (!$obj) {
+        error_log("ERROR>> fetch(): No se pudo inicializar objeto de relación '{$name}' en '{$this->table}' - Clase esperada: '{$j->getClass()}'");
+        continue;
+    }
+
+    error_log("DEBUG>> Relación '{$name}' en '{$this->table}' encontrada correctamente. Creando instancia de '{$j->getClass()}'");
+    
+    $obj->db = clone $this->db;
+    $obj->enableTables(array_keys($this->enabled_tables));
+    $obj->disableTables([$this->table]);
+    $obj->debug = $this->debug;
+    $obj->cache = $this->cache;
+    $obj->cache_ttl = $this->cache_ttl;
+
+    
+	if ($j instanceof ForeignKeys && isset($this->enabled_tables[$obj->table])) {
+		$foreignKey = $j->getKey();
+		$relatedID = $this->values[$foreignKey] ?? null;
+		$this->values[$name] = $obj->fetch($relatedID);
+	} elseif ($j instanceof MultipleJoin && isset($this->enabled_tables[$obj->table])) {
+		$obj->where = "{$obj->table}.{$j->getKey()}=" . $this->ID();
+		if ($j->getWhere()) $obj->where .= " AND {$j->getWhere()}";
+		$obj->order_by = $j->getOrderBy();
+		$obj->limit_from = $j->getLimitFrom();
+		$obj->limit_count = $j->getLimitCount();
+		if ($j->getCount()) $this->values["{$name}_count"] = $obj->count();
+		$this->values[$name] = $obj->fetchall();
+	} else {
+		$this->values[$name] = [];
+	}
+}
 	
-			$obj->db = clone $this->db;
-			$obj->enableTables(array_keys($this->enabled_tables));
-			$obj->disableTables([$this->table]);
-			$obj->debug = $this->debug;
-			$obj->cache = $this->cache;
-			$obj->cache_ttl = $this->cache_ttl;
-	
-			if ($j instanceof ForeignKeys && isset($this->enabled_tables[$obj->table])) {
-				$foreignKey = $j->key;
-				$relatedID = $this->values[$foreignKey] ?? null;
-				$this->values[$name] = $obj->fetch($relatedID);
-			} elseif ($j instanceof MultipleJoin && isset($this->enabled_tables[$obj->table])) {
-				$obj->where = "{$obj->table}.{$j->key}=" . $this->ID();
-				if ($j->where) $obj->where .= " AND {$j->where}";
-				$obj->order_by = $j->order_by;
-				$obj->limit_from = $j->limit_from;
-				$obj->limit_count = $j->limit_count;
-				if ($j->count) $this->values["{$name}_count"] = $obj->count();
-				$this->values[$name] = $obj->fetchall();
-			} else {
-				$this->values[$name] = [];
-			}
-		}
-	
+		error_log("DEBUG>> fetch(): Finalizado para ID={$ID} en tabla '{$this->table}'");
 		return $this->values;
 	}
+	
 	
 	
 	function &fetchby($name, $value)
@@ -426,6 +438,7 @@ class objdb
 
 	function doformatall($strtemplate, $tplpath=NULL) 
 	{
+		//error_log("DEBUG>> doformatall(): Finalizado para strtemplate={$strtemplate} en tplpath '{$tplpath}'");
 		if (!$tplpath)
 			$tpllist     = new Template($strtemplate);
 		else 
@@ -445,60 +458,139 @@ class objdb
 	}
 }
 
-class Join
-{
-	var $class;
-	var $_obj;
-	
-	function Join($class)
-	{
-		$this->class = $class;
-		$this->_obj  = NULL;
-	}
+class Join {
+    protected string $class;
+    protected ?object $_obj = null;
 
-	function obj() {
-		if (!$this->_obj) {
-			if (class_exists($this->class)) {
-				$this->_obj = new $this->class();
-			} else {
-				error_log("ERROR>> La clase {$this->class} no existe. class.objdb.php");
-				$this->_obj = null;
-			}
-		}
-		
-		return $this->_obj;
-	}
+    public function __construct(string $class) {
+        if (empty($class)) {
+            error_log("ERROR>> Join(): Nombre de clase vacío en class.objdb.php.");
+            throw new InvalidArgumentException("El nombre de la clase no puede estar vacío.");
+        }
+
+        $this->class = $class;
+        error_log("DEBUG>> Join(): Relación asignada a la clase '{$this->class}'.");
+    }
+
+    public function getClass(): string {
+        return $this->class;
+    }
+
+    public function obj(): ?object {
+        if ($this->_obj === null) {
+            if (class_exists($this->class)) {
+                $this->_obj = new $this->class();
+                error_log("DEBUG>> Join.obj(): Instancia de '{$this->class}' creada correctamente.");
+            } else {
+                error_log("ERROR>> Join.obj(): La clase '{$this->class}' no existe en class.objdb.php.");
+            }
+        }
+        return $this->_obj;
+    }
 }
 
-class ForeignKeys extends Join
-{
-	var $key;
-	
-	function ForeignKeys($class, $key)
-	{
-		Join::Join($class);
-		$this->key	= $key;
-	}
+class ForeignKeys extends Join {
+    protected string $key;
+
+    /**
+     * Constructor de la clase ForeignKeys
+     * @param string $class Nombre de la clase relacionada
+     * @param string $key Clave de relación
+     */
+    public function __construct(string $class, string $key) {
+        parent::__construct($class);
+
+        if (empty($key)) {
+            error_log("ERROR>> ForeignKeys(): Clave de relación vacía para la clase '{$class}'.");
+            throw new InvalidArgumentException("La clave de relación no puede estar vacía.");
+        }
+
+        $this->key = $key;
+        error_log("DEBUG>> ForeignKeys(): Relación creada con '{$class}' usando clave '{$key}'.");
+    }
+	public function getKey(): string {
+        return $this->key;
+    }
 }
 
-class MultipleJoin extends Join
-{
-	var $key;
-	var $where;
-	var $order_by;
-	var $limit_from;
-	var $limit_count;
-	var $count;
-	
-	function MultipleJoin($class, $key)
-	{
-		Join::Join($class);
-		$this->key		    = $key;
-		$this->where		= NULL;
-		$this->order_by		= NULL;
-		$this->limit_from	= NULL;
-		$this->limit_count	= NULL;
-		$this->count        = NULL;
-	}
+
+class MultipleJoin extends Join {
+    protected string $key;
+    protected ?string $where = null;
+    protected ?string $order_by = null;
+    protected ?int $limit_from = null;
+    protected ?int $limit_count = null;
+    protected ?bool $count = null;
+
+    /**
+     * Constructor de la clase MultipleJoin
+     * @param string $class Nombre de la clase relacionada
+     * @param string $key Clave de relación entre las tablas
+     */
+    public function __construct(string $class, string $key) {
+        parent::__construct($class);
+
+        if (empty($key)) {
+            error_log("ERROR>> MultipleJoin(): Clave de relación vacía en la clase '{$this->getClass()}'.");
+            throw new InvalidArgumentException("La clave de relación no puede estar vacía.");
+        }
+
+        $this->key = $key;
+        error_log("DEBUG>> MultipleJoin(): Relación creada con la clase '{$this->getClass()}' usando clave '{$key}'.");
+    }
+	// Métodos para acceder a las propiedades protegidas
+    public function getKey(): string {
+        return $this->key;
+    }
+
+    public function getWhere(): ?string {
+        return $this->where;
+    }
+
+    public function getOrderBy(): ?string {
+        return $this->order_by;
+    }
+
+    public function getLimitFrom(): ?int {
+        return $this->limit_from;
+    }
+
+    public function getLimitCount(): ?int {
+        return $this->limit_count;
+    }
+
+    public function getCount(): ?bool {
+        return $this->count;
+    }
+    /**
+     * Obtiene los datos relacionados según el ID
+     * @param int $id ID del objeto principal
+     * @return array Datos relacionados
+     */
+    public function get_data(int $id): array {
+        $obj = $this->obj();
+        if (!$obj) {
+            error_log("ERROR>> get_data(): No se pudo inicializar la clase '{$this->getClass()}' en MultipleJoin.");
+            return [];
+        }
+
+        if ($id <= 0) {
+            error_log("ERROR>> get_data(): ID inválido ({$id}) en MultipleJoin.");
+            return [];
+        }
+
+        $query = "SELECT * FROM {$obj->table} WHERE {$this->key} = {$id}";
+
+        error_log("DEBUG>> Ejecutando consulta en MultipleJoin: {$query}");
+
+        $result = $obj->query($query);
+        if (!$result) {
+            error_log("ERROR>> get_data(): Falló la consulta SQL en MultipleJoin.");
+            return [];
+        }
+
+        return $result;
+    }
 }
+
 ?>
